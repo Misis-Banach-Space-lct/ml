@@ -1,3 +1,14 @@
+model = YOLO('/content/drive/MyDrive/best.pt')
+
+import torch
+frames = []
+
+with torch.no_grad():
+  results = model.track(source='/content/drive/MyDrive/Копия 210.VC9.8.23 Набережная (Пароход) 2023-09-15 18-00-00_000+0300 [5m0s] (1).mp4',
+                        save=True, stream=True, tracker = "bytetrack.yaml", vid_stride = 5)
+  for res in results:
+    frames.append(res)
+
 import cv2
 
 class Object():
@@ -38,3 +49,9 @@ def save_cadrs(result_after_track):
     return objects
 
 saved = save_cadrs(frames)
+
+model2 = '...'
+import os
+for file in os.listdir('/content/output'):
+  if file[-3:] != 'jpg': continue
+  model2.predict(source = '/content/output/' + file, save = True)
