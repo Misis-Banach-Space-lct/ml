@@ -46,7 +46,7 @@ def process_cadr(result_model_predictor, start_conf):
           coords.append(obj[:4])
     return coords
 
-def save_cadrs(result_after_track, model_predictor):
+def save_cadrs(result_after_track, model_predictor, fps, vid_stride):
     res = result_after_track
     objects = {}
 
@@ -79,8 +79,10 @@ def save_cadrs(result_after_track, model_predictor):
                   cv2.rectangle(crop_img, (int(coodninate[0]), int(coodninate[1])), (int(coodninate[2]), int(coodninate[3])), (0, 0, 255), 2)
                   cv2.putText(crop_img, names[objects[id].cls], (int(coodninate[0]), int(coodninate[1]) + 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (36, 255 , 12), 2)
               image[y1 : y2, x1 : x2] = crop_img
-              cv2.imwrite('./cadr3/' + str(num_cadr) + '.jpg', image)
-              objects[id].path = str(num_cadr) + '.jpg'
+              # cv2.imwrite('./cadr3/' + str(num_cadr) + '.jpg', image)
+              # objects[id].path = str(num_cadr) + '.jpg'
+              cv2.imwrite('./cadr3/' + str(num_cadr) + f'_{num_cadr * (1/fps) * vid_stride}' + '.jpg', image)
+              objects[id].path = str(num_cadr) + f'_{num_cadr * (1/fps) * vid_stride}' + '.jpg'
 
     cadrs = []
     for _, obj in objects.items():
@@ -88,8 +90,11 @@ def save_cadrs(result_after_track, model_predictor):
           cadrs.append(obj)
     return cadrs
 
-saved = save_cadrs(frames, model_predictor)
 
+cap = cv2.VideoCapture(video_path)
+fps = cap.get(cv2.CAP_PROP_FPS)
+
+saved = save_cadrs(frames, model_predictor, fps, VID_STRIDE)
 
 # Поиск стационарных торговцев
 
