@@ -1,1 +1,0 @@
-from inference import get_frame_imgs_from_video

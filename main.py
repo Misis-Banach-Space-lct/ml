@@ -1,13 +1,60 @@
-from ultralytics import YOLO, RTDETR
-from inference import get_frame_imgs_from_video
+import random
+import numpy as np
+import torch
+from ultralytics import RTDETR
+from ultralytics import YOLO
+import cv2
+
+from src.detect_stationary import save_cadrs
+from src.detect_human_stationary import post_processing
+
+random.seed(42)
+np.random.seed(42)
+torch.manual_seed(42)
+
+names = {0: "animal", 1: "balloon", 2: "cart", 3: "person"}
+
+VID_STRIDE = 5
+
+
+def process(video_path: str):
+    model = YOLO("weights/yolov8l.pt")
+    model_predictor = RTDETR("weights/rtdetrl.pt")
+    model_cart = YOLO("weights/yolov8n.pt")
+
+    cap = cv2.VideoCapture(video_path)
+    fps = cap.get(cv2.CAP_PROP_FPS)
+
+    frames = []
+    with torch.no_grad():
+        results = model.track(
+            source=video_path,
+            save=True,
+            stream=True,
+            tracker="bytetrack.yaml",
+            classes=[1, 2, 3],
+            vid_stride=VID_STRIDE,
+        )
+        for res in results:
+            frames.append(res)
+
+    saved = save_cadrs(frames, model_predictor, model_cart, fps, VID_STRIDE)
+    if len(saved) > 0:
+        for save in saved:
+            print(f"TimeCode - {save.timestamp}")
+            print(f"TimeCodeML - {save.timestampML}")
+            print(f"FileName - {save.path}")
+            print(f"DetectedClassId - {save.cls}")
+
+    human_saved = post_processing(frames, fps, VID_STRIDE)
+
+    if len(human_saved) > 0:
+        for key in human_saved:
+            print(f"TimeCode - {human_saved[key].timestamp}")
+            print(f"TimeCodeML - {human_saved[key].timestampML}")
+            print(f"FileName - {human_saved[key].path}")
+            print(f"DetectedClassId - {human_saved[key].cls}")
+
 
 if __name__ == "__main__":
-    model = YOLO('weights/best_yolov8l.pt', task='detect')
-    # model = RTDETR('weights/best_rtdetrl.pt')
-
-    video_path = ["videos/flowers.mp4", "videos/video_2023-11-06_15-31-43.mp4", "videos/balloons.mp4"]
-    photo_path = "photos/photo_2023-11-06_14-08-42.jpg"
-    about_frames = get_frame_imgs_from_video(model, video_path[2])
-
-    print(about_frames)
-
+    process("videos/flowers.mp4")
