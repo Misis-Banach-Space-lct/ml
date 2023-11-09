@@ -96,7 +96,7 @@ def save_cadrs(result_after_track, model_predictor, model_cart):
 saved = save_cadrs(frames, model_predictor, model_cart)
 
 
-class Object():
+class Object2():
   def __init__(self, id, cls):
     self.id = id
     self.cls = cls
@@ -111,6 +111,7 @@ class Object():
     self.first_y1 = 0
     self.first_x2 = 0
     self.first_y2 = 0
+    self.path = []
 
 def count_objects(result_after_tracking):
   res = result_after_tracking
@@ -167,18 +168,17 @@ def select_objects(objects, result_after_tracking):
           criterion[2] = True
           # print(f'Объект {obj.id} был более, чем в половине видео')
         if False not in criterion:
+          obj.path = 'your_path' + '.jpg'
           preds[obj.id] = obj
 
     return preds
 
 def Show(preds, result_after_tracking):
-    x = 0
     for _, obj in preds.items():
-      x += 1
       image = result_after_tracking[obj.start_frame].orig_img.copy()
       cv2.rectangle(image, (int(obj.first_x1) + 1, int(obj.first_y1) + 1), (int(obj.first_x2) + 1, int(obj.first_y2) + 1), (0, 0, 255), 2)
       # cv2.putText(image, 'StacionarnyTorgovec', (int(obj.first_x1), int(obj.first_y1 - 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (36, 255 , 12), 2)
-      cv2.imwrite('your_path' + '.jpg', image)
+      cv2.imwrite(obj.path, image)
 
 def Post_Processing(res):
     objects = count_objects(res)
