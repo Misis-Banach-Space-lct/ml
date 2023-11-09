@@ -60,7 +60,9 @@ def count_objects(result_after_tracking: list, fps: float, vid_stride: int) -> d
     return objects
 
 
-def select_objects(objects: dict, result_after_tracking: list, vid_stride: int) -> dict:
+def select_objects(
+    objects: dict, result_after_tracking: list, vid_stride: int, save_path: str
+) -> dict:
     if len(result_after_tracking) * vid_stride < 2600:  # меньше 2 минут
         print(
             "Видео слишком короткое для корректного выявления для стационарных торговцев, могут быть ошибки!"
@@ -97,7 +99,7 @@ def select_objects(objects: dict, result_after_tracking: list, vid_stride: int) 
             criterion[2] = True
             # print(f'Объект {obj.id} был более, чем в половине видео')
         if False not in criterion:
-            obj.path = f"output/frames_h/{obj.detected_obj_id}" + ".jpg"
+            obj.path = save_path + f"/{obj.detected_obj_id}" + ".jpg"
             preds[obj.detected_obj_id] = obj
 
     return preds
@@ -117,9 +119,11 @@ def show(preds: dict, result_after_tracking: list):
         cv2.imwrite(obj.path, image)
 
 
-def post_processing(result_after_tracking: list, fps: float, vid_stride: int) -> dict:
+def post_processing(
+    result_after_tracking: list, fps: float, vid_stride: int, save_path: str
+) -> dict:
     objects = count_objects(result_after_tracking, fps, vid_stride)
-    preds = select_objects(objects, result_after_tracking, vid_stride)
+    preds = select_objects(objects, result_after_tracking, vid_stride, save_path)
     print(preds.keys(), ": Возможные торговцы")
     show(preds, result_after_tracking)
 

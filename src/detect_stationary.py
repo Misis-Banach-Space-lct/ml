@@ -40,7 +40,12 @@ def process_cadr(
 
 
 def save_cadrs(
-    result_after_track: list, model_predictor, model_cart, fps: float, vid_stride: int
+    result_after_track: list,
+    model_predictor,
+    model_cart,
+    fps: float,
+    vid_stride: int,
+    save_path: str,
 ) -> list:
     res = result_after_track
     objects = {}
@@ -90,10 +95,8 @@ def save_cadrs(
                     timestamp_ml = num_cadr * (1 / fps)
                     timestamp_orig = timestamp_ml * vid_stride
 
-                    save_path = f"output/frames/{num_cadr}" + ".jpg"
-
-                    cv2.imwrite(save_path, image)
-                    objects[id].path.append(save_path)
+                    cv2.imwrite(save_path + f"/{num_cadr}" + ".jpg", image)
+                    objects[id].path.append(save_path + f"/{num_cadr}" + ".jpg")
 
                     objects[id].timestamp = timestamp_orig
                     objects[id].timestampML = timestamp_ml

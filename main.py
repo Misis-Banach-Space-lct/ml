@@ -40,18 +40,18 @@ def process(video_path: str):
         for res in results:
             frames.append(res)
 
-    saved = save_cadrs(frames, model_predictor, model_cart, fps, vid_stride)
+    saved = save_cadrs(frames, model_predictor, model_cart, fps, vid_stride, save_path='output/frames')
 
-    """
+
     if len(saved) > 0:
         for save in saved:
             print(f"TimeCode - {save.timestamp}")
             print(f"TimeCodeML - {save.timestampML}")
             print(f"FileName - {save.path}")
             print(f"DetectedClassId - {save.cls}")
-    """
 
-    human_saved = post_processing(frames, fps, vid_stride)
+
+    human_saved = post_processing(frames, fps, vid_stride, save_path='output/frames_h')
 
     """
     if len(human_saved) > 0:
@@ -63,4 +63,4 @@ def process(video_path: str):
     """
 
 if __name__ == "__main__":
-    process("videos/flowers.mp4")
+    process("videos/balloons.mp4")
