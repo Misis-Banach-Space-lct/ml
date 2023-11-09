@@ -24,7 +24,7 @@ def check_cart(model_cart, image_path: str) -> bool:
 
 
 def process_cadr(
-    result_model_predictor: list, start_conf: int, image_path: str, model_cart
+    result_model_predictor: list, start_conf: float, image_path: str, model_cart
 ) -> list:
     coords = []
     res = result_model_predictor[0].boxes
