@@ -89,8 +89,12 @@ def save_cadrs(
 
                     timestamp_ml = num_cadr * (1 / fps)
                     timestamp_orig = timestamp_ml * vid_stride
-                    cv2.imwrite(f"output/frames/{num_cadr}" + ".jpg", image)
-                    objects[id].path.append(f"output/frames/{num_cadr}" + ".jpg")
+
+                    save_path = f"output/frames/{num_cadr}" + ".jpg"
+
+                    cv2.imwrite(save_path, image)
+                    objects[id].path.append(save_path)
+
                     objects[id].timestamp = timestamp_orig
                     objects[id].timestampML = timestamp_ml
 
