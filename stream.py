@@ -28,6 +28,7 @@ class Object2():
     self.first_y1 = 0
     self.first_x2 = 0
     self.first_y2 = 0
+    self.image = None
 
 def check_cart(model_cart, image):
     check = model_cart.predict(source = image, classes = [1, 2, 3, 5, 6, 7])
@@ -45,7 +46,7 @@ def process_cadr(result_model_predictor, start_conf, image, model_cart):
         if int(obj[-1]) == 2:
           if check_cart(model_cart, image) == False: continue
         # if (obj[-2] + start_conf) / 2 > 0.5 or obj[-2] > 0.7:
-        if (obj[-2] + start_conf) / 2 > 0.5:
+        if (obj[-2] + start_conf) / 2 > 0.6:
           coords.append(obj[:4])
     return coords
 
@@ -79,8 +80,8 @@ def save_cadrs(result_after_track, model_predictor, model_cart):
                 cv2.rectangle(crop_img, (int(coodninate[0]), int(coodninate[1])), (int(coodninate[2]), int(coodninate[3])), (0, 0, 255), 2)
                 cv2.putText(crop_img, names[objects[id].cls], (int(coodninate[0]), int(coodninate[1]) + 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (36, 255 , 12), 2)
             image[y1 : y2, x1 : x2] = crop_img
-            cv2.imwrite('your_path' + '.jpg', image)
-            objects[id].path.append('your_path' + '.jpg')
+            cv2.imwrite('./objects/' + str(id) + str(num_frames) + '.jpg', image)
+            objects[id].path.append('./objects/' + str(id) + str(num_frames) + '.jpg')
 
     cadrs = []
     for _, obj in objects.items():
@@ -89,11 +90,17 @@ def save_cadrs(result_after_track, model_predictor, model_cart):
     return cadrs
     # return objects
 
+def draw_photo(obj):
+    image = obj.image.copy()
+    cv2.rectangle(image, (int(obj.first_x1) + 1, int(obj.first_y1) + 1), (int(obj.first_x2) + 1, int(obj.first_y2) + 1), (0, 0, 255), 2)
+    cv2.imwrite('./people/' + str(obj.id) + '.jpg', image)
+
 def check_person(res):
     for obj in res.boxes.data:
       if obj[-1] != 3: continue
 
       id = int(obj[4])
+      if id == 0: continue
       x1, y1, x2, y2 = obj[:4]
 
       if id not in people.keys():
@@ -105,6 +112,7 @@ def check_person(res):
         people[id].first_y1 = y1
         people[id].first_x2 = x2
         people[id].first_y2 = y2
+        people[id].image = res.orig_img
 
       people[id].frame_counts += 1
       people[id].end_frame = num_frames
@@ -116,8 +124,7 @@ def check_person(res):
 
 
     preds = {}
-    boundary_zone = int(min(res[0].orig_shape[0], res[0].orig_shape[1]) / 4)
-    # frequency_occurrence = 0.4
+    boundary_zone = int(min(res.orig_shape[0], res.orig_shape[1]) / 4)
     fullness = 0.4
 
     for _, obj in people.items():
@@ -128,28 +135,22 @@ def check_person(res):
         if (obj.end_frame - obj.start_frame) > 0 and obj.frame_counts / (obj.end_frame - obj.start_frame) > fullness:
           criterion[1] = True
           # print(f'Объект {obj.id} хорошо детектился')
-        if obj.frame_counts > 300: # 300 поменять нужно на что-то другое
+        if obj.frame_counts > 50: # 300 поменять нужно на что-то другое
           criterion[2] = True
           # print(f'Объект {obj.id} был более, чем в половине видео')
         if False not in criterion:
           preds[obj.id] = obj
+          draw_photo(obj)
           
     return preds
 
-# def Show(preds, result_after_tracking):
-#     for _, obj in preds.items():
-#       image = result_after_tracking[obj.start_frame].orig_img.copy()
-#       cv2.rectangle(image, (int(obj.first_x1) + 1, int(obj.first_y1) + 1), (int(obj.first_x2) + 1, int(obj.first_y2) + 1), (0, 0, 255), 2)
-#       # cv2.putText(image, 'StacionarnyTorgovec', (int(obj.first_x1), int(obj.first_y1 - 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (36, 255 , 12), 2)
-#       cv2.imwrite(obj.path, image)
-
-VID_STRIDE = 20
-
 with torch.no_grad():
-  results = model.track(source = 'rtsp://admin:A1234567@188.170.176.190:8027/Streaming/Channels/101?transportmode=unicast&profile=Profile_1',
-                        save = True, stream = True, tracker = "bytetrack.yaml", classes = [1, 2, 3], vid_stride = 1)
+  results = model.track(source = 'ссылка на стрим',
+                        save = True, stream = True, tracker = "bytetrack.yaml", classes = [1, 2, 3])
   for res in results:
     num_frames += 1
     print('Кадр обрабатывается')
     saved = save_cadrs(res, model_predictor, model_cart)
-    print(check_person(res))
+    pers = check_person(res)
+    print(pers)
+    print(saved)
