@@ -37,11 +37,10 @@ def process(video_path: str, rtsp: bool = False):
                 )
                 if len(saved) > 0:
                     for key in saved:
-                        print(saved[key].path)
-                        # print(f"TimeCode - {save.timestamp}")
-                        # print(f"TimeCodeML - {save.timestampML}")
-                        # print(f"FileName - {save.path}")
-                        # print(f"DetectedClassId - {save.cls}")
+                        # print(f"TimeCode - {saved[key].timestamp}")
+                        # print(f"TimeCodeML - {saved[key].timestampML}")
+                        # print(f"FileName - {saved[key].path}")
+                        # print(f"DetectedClassId - {saved[key].cls}")
     else:
         cap = cv2.VideoCapture(video_path)
         fps = cap.get(cv2.CAP_PROP_FPS)
