@@ -168,7 +168,6 @@ def select_objects(objects, result_after_tracking):
           criterion[2] = True
           # print(f'Объект {obj.id} был более, чем в половине видео')
         if False not in criterion:
-          obj.path = 'your_path' + '.jpg'
           preds[obj.id] = obj
 
     return preds
