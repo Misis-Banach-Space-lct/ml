@@ -46,7 +46,11 @@ def process_cadr(
 
 
 def save_cadrs(
-    result_after_track: list, model_predictor, model_cart, save_path: str
+    result_after_track: list,
+    model_predictor,
+    model_cart,
+    save_path: str,
+    num_frame: int,
 ) -> dict:
     cadr = result_after_track
     objects = {}
@@ -57,7 +61,7 @@ def save_cadrs(
         id = float(obj[4])
         if not id in objects.keys():
             objects[id] = DetectObjectsStream(id, int(obj[-1]))
-            objects[id].start = time.time()
+            objects[id].start = num_frame
 
         if objects[id].cnt < 20 or obj[-2] > objects[id].conf:
             objects[id].conf = obj[-2]
@@ -97,8 +101,8 @@ def save_cadrs(
                     )
                 image[y1:y2, x1:x2] = crop_img
                 now = datetime.datetime.now()
-                cv2.imwrite(save_path + f"/{str(objects[id].cnt)}" + ".jpg", image)
-                objects[id].path = save_path + f"/{str(objects[id].cnt)}" + ".jpg"
+                cv2.imwrite(save_path + f"/{str(num_frame)}" + ".jpg", image)
+                objects[id].path = save_path + f"/{str(num_frame)}" + ".jpg"
                 objects[id].timestamp = now
 
     # cadrs = []

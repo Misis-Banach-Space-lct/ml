@@ -30,17 +30,25 @@ def process(video_path: str, rtsp: bool = False):
                 tracker="bytetrack.yaml",
                 classes=[1, 2, 3],
             )
+            num_frame = 0
             for res in results:
+                num_frame += 1
                 print("Кадр обрабатывается")
                 saved = save_cadrs_stream(
-                    res, model_predictor, model_cart, save_path="output/frames_stream"
+                    res,
+                    model_predictor,
+                    model_cart,
+                    save_path="output/frames_stream",
+                    num_frame=num_frame,
                 )
+                """
                 if len(saved) > 0:
                     for key in saved:
                         # print(f"TimeCode - {saved[key].timestamp}")
                         # print(f"TimeCodeML - {saved[key].timestampML}")
                         print(f"FileName - {saved[key].path}")
                         # print(f"DetectedClassId - {saved[key].cls}")
+                """
     else:
         cap = cv2.VideoCapture(video_path)
         fps = cap.get(cv2.CAP_PROP_FPS)
@@ -61,8 +69,6 @@ def process(video_path: str, rtsp: bool = False):
             )
             for res in results:
                 frames.append(res)
-
-
 
         saved = save_cadrs(
             # video_id=1,
@@ -99,6 +105,6 @@ def process(video_path: str, rtsp: bool = False):
 
 if __name__ == "__main__":
     process(
-        video_path='rtsp://admin:A1234567@188.170.176.190:8029/Streaming/Channels/101?transportmode=unicast&profile=Profile_1',
-        rtsp=True
+        video_path="rtsp://admin:A1234567@188.170.176.190:8028/Streaming/Channels/101?transportmode=unicast&profile=Profile_1",
+        rtsp=True,
     )
