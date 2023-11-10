@@ -126,7 +126,7 @@ def count_objects(result_after_tracking):
 
       if id not in objects.keys():
         cls = int(obj[-1])
-        objects[id] = Object(id, cls)
+        objects[id] = Object2(id, cls)
         objects[id].start_frame = num_frame
 
         objects[id].first_x1 = x1
