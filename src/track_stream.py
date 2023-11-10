@@ -1,9 +1,11 @@
-import torch
 import time
+import datetime
+
+import torch
 import cv2
 
-frames = []
-objects = {}
+# frames = []
+# objects = {}
 names = {0: "animal", 1: "balloon", 2: "cart", 3: "person"}
 
 
@@ -15,6 +17,8 @@ class DetectObjectsStream:
         self.start = 0
         self.path = ""
         self.conf = 0
+
+        self.timestamp = ""
 
 
 def check_cart(model_cart, image_path: str) -> bool:
@@ -41,9 +45,11 @@ def process_cadr(
     return coords
 
 
-def save_cadrs(result_after_track: list, model_predictor, model_cart):
+def save_cadrs(
+    result_after_track: list, model_predictor, model_cart, save_path: str
+) -> dict:
     cadr = result_after_track
-
+    objects = {}
     for obj in cadr.boxes.data:
         if int(obj[-1]) == 3 or int(obj[-1]) == 0:
             continue
@@ -90,8 +96,10 @@ def save_cadrs(result_after_track: list, model_predictor, model_cart):
                         2,
                     )
                 image[y1:y2, x1:x2] = crop_img
-                cv2.imwrite("./xxx/" + str(objects[id].cnt) + ".jpg", image)
-                objects[id].path = "./xxx/" + str(objects[id].cnt) + ".jpg"
+                now = datetime.datetime.now()
+                cv2.imwrite(save_path + f"/{str(objects[id].cnt)}" + ".jpg", image)
+                objects[id].path = save_path + f"/{str(objects[id].cnt)}" + ".jpg"
+                objects[id].timestamp = now
 
     # cadrs = []
     # for _, obj in objects.items():
