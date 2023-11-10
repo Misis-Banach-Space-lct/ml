@@ -47,7 +47,6 @@ def save_cadrs(
     fps: float,
     vid_stride: int,
     save_path: str,
-    cap,
 ) -> list:
     res = result_after_track
     objects = {}

@@ -39,7 +39,7 @@ def process(video_path: str, rtsp: bool = False):
                     for key in saved:
                         # print(f"TimeCode - {saved[key].timestamp}")
                         # print(f"TimeCodeML - {saved[key].timestampML}")
-                        # print(f"FileName - {saved[key].path}")
+                        print(f"FileName - {saved[key].path}")
                         # print(f"DetectedClassId - {saved[key].cls}")
     else:
         cap = cv2.VideoCapture(video_path)
@@ -66,7 +66,6 @@ def process(video_path: str, rtsp: bool = False):
 
         saved = save_cadrs(
             # video_id=1,
-            cap=cap,
             result_after_track=frames,
             model_predictor=model_predictor,
             model_cart=model_cart,
@@ -100,5 +99,6 @@ def process(video_path: str, rtsp: bool = False):
 
 if __name__ == "__main__":
     process(
-        video_path='videos/balloons.mp4'
+        video_path='rtsp://admin:A1234567@188.170.176.190:8029/Streaming/Channels/101?transportmode=unicast&profile=Profile_1',
+        rtsp=True
     )
