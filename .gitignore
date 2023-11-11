@@ -83,3 +83,8 @@ fabric.properties
 ./videos
 ./venv
 
+tracking.py
+.idea/ldt_krasnodar.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/inspectionProfiles/profiles_settings.xml

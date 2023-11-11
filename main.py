@@ -7,7 +7,10 @@ import cv2
 
 from src.detect_stationary import save_cadrs
 from src.detect_human_stationary import post_processing
-from src.track_stream import save_cadrs as save_cadrs_stream
+from src.dbscan_moving import moving_count, otbor
+
+from src.track_stream import save_cadrs as save_cadrs_stream, check_person
+from src.dbscan_stream import moving_stream
 
 random.seed(42)
 np.random.seed(42)
@@ -33,6 +36,8 @@ def process(video_path: str, rtsp: bool = False):
             num_frame = 0
             for res in results:
                 num_frame += 1
+                objects = {}
+                people = {}
                 print("Кадр обрабатывается")
                 saved = save_cadrs_stream(
                     res,
@@ -40,6 +45,7 @@ def process(video_path: str, rtsp: bool = False):
                     model_cart,
                     save_path="output/frames_stream",
                     num_frame=num_frame,
+                    objects=objects
                 )
                 """
                 if len(saved) > 0:
@@ -49,6 +55,19 @@ def process(video_path: str, rtsp: bool = False):
                         print(f"FileName - {saved[key].path}")
                         # print(f"DetectedClassId - {saved[key].cls}")
                 """
+
+                human_saved = check_person(
+                    res,
+                    num_frames=num_frame,
+                    people=people
+                )
+
+                actives = {}
+                active_saved = moving_stream(
+                    res,
+                    num_frames=num_frame,
+                    objects3=actives
+                )
     else:
         cap = cv2.VideoCapture(video_path)
         fps = cap.get(cv2.CAP_PROP_FPS)
@@ -101,6 +120,9 @@ def process(video_path: str, rtsp: bool = False):
                 print(f"FileName - {human_saved[key].path}")
                 print(f"DetectedClassId - {human_saved[key].cls}")
         """
+
+        objects_active = moving_count(frames, fps=fps, vid_stride=vid_stride)
+        active_saved = otbor(objects_active, save_path='output/frames_active')
 
 
 if __name__ == "__main__":
