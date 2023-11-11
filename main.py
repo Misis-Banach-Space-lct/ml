@@ -59,14 +59,16 @@ def process(video_path: str, rtsp: bool = False):
                 human_saved = check_person(
                     res,
                     num_frames=num_frame,
-                    people=people
+                    people=people,
+                    save_path="output/frames_h_stream"
                 )
 
                 actives = {}
                 active_saved = moving_stream(
                     res,
                     num_frames=num_frame,
-                    objects3=actives
+                    objects3=actives,
+                    save_path="output/frames_active_stream"
                 )
     else:
         cap = cv2.VideoCapture(video_path)
